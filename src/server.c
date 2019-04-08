@@ -102,16 +102,15 @@ int send_response(int fd, char *header, char *content_type, void *body, int cont
 void get_d20(int fd)
 {
     // Generate a random number between 1 and 20 inclusive
+    int random = (rand() % 20) + 1;
 
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
+    // parse int to string
+    char body[sizeof(int)];
+    sprintf(body, "%d", random);
 
     // Use send_response() to send it back as text/plain data
-
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
+    // int send_response(int fd, char *header, char *content_type, void *body, int content_length)
+    send_response(fd, "HTTP/1.1 200 OK", "text/plain", &body, sizeof(body));
 }
 
 /**
@@ -202,6 +201,7 @@ void handle_http_request(int fd, struct cache *cache)
         if (!strcmp("/d20", path))
         {
             // Check if it's /d20 and handle that special case
+            // printf("GET D20");
             get_d20(fd);
         }
         else
@@ -219,6 +219,8 @@ void handle_http_request(int fd, struct cache *cache)
  */
 int main(void)
 {
+    srand((unsigned int)time(NULL));
+
     int newfd;                          // listen on sock_fd, new connection on newfd
     struct sockaddr_storage their_addr; // connector's address information
     char s[INET6_ADDRSTRLEN];
