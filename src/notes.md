@@ -12,7 +12,7 @@
 - cache.h and cache.c
   - are where you will implement the LRU cache functionality for days 3 and 4
 
-##### Day 1
+##### Day 1/Day 2
 - Implement send_response()
   - format HTTP response
   - write response to ```response``` variable
@@ -20,6 +20,10 @@
   - ```content_length```: length of body only
 - handle_http_request() in the file server.c
   - direct to correct response
+- Implement arbitrary file serving
+  - map to serverroot directory to check for files
+  - use functionality in file.c
+  - use mime.c for Content-Type header information
 
 ##### Run Server
 - make

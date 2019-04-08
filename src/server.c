@@ -128,16 +128,17 @@ void resp_404(int fd)
 
     if (filedata == NULL)
     {
-        // TODO: make this non-fatal
-        fprintf(stderr, "cannot find system 404 file\n");
-        exit(3);
+        char *response = "404 Not Found";
+        send_response(fd, "HTTP/1.1 404 NOT FOUND", "text/plain", response, sizeof(response));
     }
+    else
+    {
+        mime_type = mime_type_get(filepath);
 
-    mime_type = mime_type_get(filepath);
+        send_response(fd, "HTTP/1.1 404 NOT FOUND", mime_type, filedata->data, filedata->size);
 
-    send_response(fd, "HTTP/1.1 404 NOT FOUND", mime_type, filedata->data, filedata->size);
-
-    file_free(filedata);
+        file_free(filedata);
+    }
 }
 
 /**
@@ -145,9 +146,25 @@ void resp_404(int fd)
  */
 void get_file(int fd, struct cache *cache, char *request_path)
 {
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
+    char filepath[4096];
+    struct file_data *filedata;
+    char *mime_type;
+
+    // Fetch the 404.html file
+    snprintf(filepath, sizeof filepath, "%s%s", SERVER_FILES, request_path);
+    printf("filepath: %s\n", filepath);
+    filedata = file_load(filepath);
+
+    if (filedata == NULL)
+    {
+        resp_404(fd);
+    }
+    else
+    {
+        mime_type = mime_type_get(filepath);
+        send_response(fd, "HTTP/1.1 200 OK", mime_type, filedata->data, filedata->size);
+        file_free(filedata);
+    }
 }
 
 /**
