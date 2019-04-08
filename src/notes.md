@@ -18,6 +18,8 @@
   - write response to ```response``` variable
   - ```response_length```: total length of header and body (how many bytes to send)
   - ```content_length```: length of body only
+- handle_http_request() in the file server.c
+  - direct to correct response
 
 ##### Run Server
 - make

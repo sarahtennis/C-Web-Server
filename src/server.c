@@ -181,16 +181,35 @@ void handle_http_request(int fd, struct cache *cache)
         return;
     }
 
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
+    /*
+        GET /example HTTP/1.1
+        Host: lambdaschool.com
+    */
 
     // Read the three components of the first request line
+    char method[200];
+    char path[8192];
+    char protocol[200];
+
+    sscanf(request, "%s %s %s", method, path, protocol);
+    // printf("method: %s\n", method);
+    // printf("path: %s\n", path);
+    // printf("protocol: %s\n", protocol);
 
     // If GET, handle the get endpoints
-
-    //    Check if it's /d20 and handle that special case
-    //    Otherwise serve the requested file by calling get_file()
+    if (!strcmp("GET", method))
+    {
+        if (!strcmp("/d20", path))
+        {
+            // Check if it's /d20 and handle that special case
+            get_d20(fd);
+        }
+        else
+        {
+            // Otherwise serve the requested file by calling get_file()
+            get_file(fd, cache, path);
+        }
+    }
 
     // (Stretch) If POST, handle the post request
 }
@@ -244,8 +263,6 @@ int main(void)
         // listenfd is still listening for new connections.
 
         handle_http_request(newfd, cache);
-
-        resp_404(newfd);
 
         close(newfd);
     }
