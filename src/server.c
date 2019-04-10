@@ -66,27 +66,25 @@ int send_response(int fd, char *header, char *content_type, void *body, int cont
     */
 
     time_t current_time = time(NULL);
-    struct tm *local_time = localtime(&current_time);
-    int response_length;
+    // struct tm *local_time = localtime(&current_time);
+    int response_length = 0;
 
-    sprintf(response,
-            "%s\n"
-            "Date: %s"
-            "Connection: close\n"
-            "Content-Length: %d\n"
-            "Content-Type: %s\n"
-            "\n"
-            "%s",
-            header,
-            asctime(local_time),
-            strlen(body),
-            content_type,
-            body);
+    response_length = sprintf(response,
+                              "%s\n"
+                              "Date: %s"
+                              "Connection: close\n"
+                              "Content-Length: %d\n"
+                              "Content-Type: %s\n"
+                              "\n",
+                              header,
+                              asctime(gmtime(&current_time)),
+                              strlen(body),
+                              content_type);
 
-    response_length = strlen(response);
+    memcpy(&(response[response_length]), body, content_length);
 
     // Send it all!
-    int rv = send(fd, response, response_length, 0);
+    int rv = send(fd, response, response_length + content_length, 0);
 
     if (rv < 0)
     {
