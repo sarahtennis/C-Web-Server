@@ -114,12 +114,32 @@ struct cache_entry *dllist_remove_tail(struct cache *cache)
  * 
  * max_size: maximum number of entries in the cache
  * hashsize: hashtable size (0 for default)
+ * 
+ * struct cache {
+    struct hashtable *index;
+    struct cache_entry *head, *tail; // Doubly-linked list
+    int max_size; // Maxiumum number of entries
+    int cur_size; // Current number of entries
+   };
+
+    if (hashf == NULL) {
+        hashf = default_hashf;
+    }
  */
 struct cache *cache_create(int max_size, int hashsize)
 {
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
+    struct cache *new_cache = malloc(sizeof(struct cache));
+
+    // struct hashtable *hashtable_create(int size, int (*hashf)(void *, int, int))
+    new_cache->index = hashtable_create(max_size, NULL);
+
+    new_cache->head = NULL;
+    new_cache->tail = NULL;
+
+    new_cache->max_size = max_size;
+    new_cache->cur_size = 0;
+
+    return new_cache;
 }
 
 void cache_free(struct cache *cache)
