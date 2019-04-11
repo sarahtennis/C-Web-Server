@@ -148,20 +148,35 @@ void get_file(int fd, struct cache *cache, char *request_path)
     struct file_data *filedata;
     char *mime_type;
 
-    // Fetch the 404.html file
-    snprintf(filepath, sizeof filepath, "%s%s", SERVER_FILES, request_path);
-    printf("filepath: %s\n", filepath);
-    filedata = file_load(filepath);
+    struct cache_entry *entry = cache_get(cache, request_path); // NULL if not in cache
 
-    if (filedata == NULL)
+    if (entry) // entry in cache
     {
-        resp_404(fd);
+        send_response(fd, "HTTP/1.1 200 OK", entry->content_type, entry->content, entry->content_length);
     }
-    else
+    else // entry not in cache, check files
     {
-        mime_type = mime_type_get(filepath);
-        send_response(fd, "HTTP/1.1 200 OK", mime_type, filedata->data, filedata->size);
-        file_free(filedata);
+        // Fetch the file
+        snprintf(filepath, sizeof filepath, "%s%s", SERVER_FILES, request_path);
+        printf("filepath: %s\n", filepath);
+        filedata = file_load(filepath);
+
+        if (filedata == NULL)
+        {
+            resp_404(fd);
+        }
+        else
+        {
+            mime_type = mime_type_get(filepath);
+
+            // put in cache
+            // cache_put(struct cache *cache, char *path, char *content_type, void *content, int content_length)
+            cache_put(cache, request_path, mime_type, filedata->data, filedata->size);
+
+            // send response
+            send_response(fd, "HTTP/1.1 200 OK", mime_type, filedata->data, filedata->size);
+            file_free(filedata);
+        }
     }
 }
 
