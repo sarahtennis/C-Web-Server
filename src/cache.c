@@ -204,7 +204,18 @@ void cache_put(struct cache *cache, char *path, char *content_type, void *conten
  */
 struct cache_entry *cache_get(struct cache *cache, char *path)
 {
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
+    // Attempt to find the cache entry pointer by path in the hash table.
+    struct cache_entry *retrieve_entry = hashtable_get(cache->index, path);
+
+    // If not found, return NULL.
+    if (!retrieve_entry)
+    {
+        return NULL;
+    }
+
+    // Move the cache entry to the head of the doubly-linked list.
+    dllist_move_to_head(cache, retrieve_entry);
+
+    // Return the cache entry pointer.
+    return retrieve_entry;
 }
